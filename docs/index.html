@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rutas sin cuestas</title>
+<meta name="description" content="Ruta de ida y vuelta en Valdivia evitando las subidas empinadas.">
+<meta name="theme-color" content="#1f6feb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="iconos/icono-192.png">
+<link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sin cuestas">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="mapa"></div>
+<section id="panel">
+  <div class="cabeza">
+    <h1>Rutas sin cuestas <small>Valdivia</small></h1>
+    <button id="plegar" class="solo-movil" aria-label="Mostrar u ocultar detalles">Detalles ▴</button>
+  </div>
+  <p id="estado">Cargando la red de calles…</p>
+  <div class="botones">
+    <button id="miUbic" title="Usar mi ubicación como inicio (A)">📍 Desde aquí</button>
+    <button id="seguir" title="Mostrar mi posición en el mapa">🧭 Seguirme</button>
+    <button id="limpiar">Limpiar</button>
+  </div>
+  <div id="resumen"></div>
+  <div id="detalles">
+    <label>Pendiente molesta desde: <b id="vu">6</b> %</label>
+    <input id="umbral" type="range" min="3" max="12" step="0.5" value="6">
+    <label>Rechazo a esas subidas: <b id="vf">2</b></label>
+    <input id="fuerza" type="range" min="0" max="10" step="0.5" value="2">
+    <label class="check"><input id="escaleras" type="checkbox"> permitir escaleras</label>
+    <label class="check"><input id="capa" type="checkbox"> ver calles empinadas (≥ 6 %)</label>
+    <div class="botones">
+      <button id="gpx">Bajar GPX</button>
+      <button id="compartir">Compartir ruta</button>
+      <button id="instalar" hidden>Instalar app</button>
+    </div>
+    <div id="perfiles"></div>
+    <details>
+      <summary>Cómo funciona</summary>
+      <p>Toca el mapa: primero el inicio (A) y después el destino (B); un toque más cambia el destino.
+      Los marcadores se pueden arrastrar. Se calculan la ida A→B y la vuelta B→A: todas las calles valen en
+      los dos sentidos, pero subir cuesta y bajar no, así que la ida y la vuelta pueden ir por calles distintas.</p>
+      <p>Cada metro subido vale 8 metros planos (regla de Naismith) y las subidas sobre la «pendiente molesta»
+      se castigan aún más, según el «rechazo». Las alturas son de FABDEM (30 m, sin edificios ni árboles): las
+      cuestas muy cortas pueden salir algo más suaves de lo que son. Tiempo a pie según Tobler.</p>
+      <p id="instalarIOS" hidden><b>Instalar en iPhone:</b> en Safari, botón Compartir → «Agregar a inicio».</p>
+    </details>
+    <details>
+      <summary>Red y correcciones de topología</summary>
+      <div id="info"></div>
+    </details>
+    <p class="fuentes">Calles © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> (ODbL) ·
+      Alturas <a href="https://doi.org/10.1088/1748-9326/ac4d4f" target="_blank" rel="noopener">FABDEM</a> (CC BY-NC-SA 4.0) ·
+      <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a></p>
+  </div>
+</section>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="ruteo.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

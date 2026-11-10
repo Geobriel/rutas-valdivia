@@ -1,0 +1,8 @@
+# descargas y productos que se rehacen con rutas_pendiente.py
+cache/
+salidas/
+# el .exe se publica como «release» en GitHub, no en git
+dist/
+build/
+*.spec
+__pycache__/
