@@ -1,7 +1,7 @@
 /* sw.js — Modo sin conexión: guarda la app y la red, y las teselas del mapa que se van viendo.
  * VERSION la reescribe `python rutas_pendiente.py --web` (y crear_exe.py) con un hash de los archivos:
  * si algo cambia, el teléfono baja la versión nueva la próxima vez que abre la app con internet. */
-const VERSION = 'e8ebbd1e4511';
+const VERSION = '8f9f57764156';
 const APP = 'rutas-app-' + VERSION;
 const TESELAS = 'rutas-teselas';
 const MAX_TESELAS = 3000;

@@ -122,6 +122,16 @@ def bajar_osm(bbox, actualizar=False):
     return datos
 
 
+def extension_osm(osm, bbox):
+    """Recuadro que cubre el recuadro pedido y TODOS los nodos bajados: Overpass entrega las vías
+    completas aunque se salgan del recuadro, y el DEM tiene que cubrirlas (si no, quedan sin altura)."""
+    lon = [el["lon"] for el in osm["elements"] if el["type"] == "node"]
+    lat = [el["lat"] for el in osm["elements"] if el["type"] == "node"]
+    r = lambda x, f: round(f(x * 100) / 100, 2)          # a la centésima de grado, hacia afuera
+    return [r(min(bbox[0], min(lon)), math.floor), r(min(bbox[1], min(lat)), math.floor),
+            r(max(bbox[2], max(lon)), math.ceil), r(max(bbox[3], max(lat)), math.ceil)]
+
+
 def bajar_fabdem(bbox):
     """Recorta FABDEM al recuadro leyendo solo la tesela necesaria dentro del zip remoto."""
     w, s, e, n = bbox
@@ -480,6 +490,13 @@ class Red:
         altura = interpolador_dem(ruta_dem)
         z = altura(self.xy[:, 0], self.xy[:, 1])
         n = len(z)
+        # resguardo: un nodo fuera del DEM queda sin altura (NaN) y su tramo, con costo NaN, quedaría
+        # inservible; se le da la altura del nodo con altura más cercano
+        sin_z = np.isnan(z)
+        if sin_z.any():
+            _, cerca = cKDTree(self.xy[~sin_z]).query(self.xy[sin_z])
+            z[sin_z] = z[~sin_z][cerca]
+        self.resumen["nodos fuera del DEM (altura del vecino)"] = int(sin_z.sum())
         # puentes y túneles: interpolar desde los extremos (IDW con distancia por la red,
         # que entre dos extremos es exactamente una interpolación lineal)
         inc = np.bincount(self.pu, minlength=n) + np.bincount(self.pv, minlength=n)
@@ -878,7 +895,7 @@ def main():
     args = ap.parse_args()
     bbox = list(args.bbox)
     osm = bajar_osm(bbox, args.actualizar)
-    dem = args.dem or bajar_fabdem(bbox)
+    dem = args.dem or bajar_fabdem(extension_osm(osm, bbox))
     red = Red(osm, dem, bbox)
     dem_nombre = "propio: " + dem.name if args.dem else "FABDEM V1-2 (30 m, sin edificios ni árboles)"
     if args.exportar:
